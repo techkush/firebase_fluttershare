@@ -18,7 +18,30 @@ class _TimelineState extends State<Timeline> {
     // TODO: implement initState
     //getUsers();
     //getUserById();
+    //createUser();
+    //updateUser();
+    deleteUser();
     super.initState();
+  }
+
+  createUser() async{
+    await userRef.document('aahssdbdddnd').setData({
+      'username': 'Jeff',
+      'postCount': 0,
+      'isAdmin': false
+    });
+  }
+
+  updateUser() async{
+    await userRef.document('aahssdbdddnd').updateData({
+      'username': 'Jeff Mark',
+      'postCount': 0,
+      'isAdmin': false
+    });
+  }
+
+  deleteUser() async{
+    await userRef.document('aahssdbdddnd').delete();
   }
 
 //  getUserById() async{
