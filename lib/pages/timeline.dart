@@ -28,7 +28,10 @@ class _TimelineState extends State<Timeline> {
 //  }
 
   getUsers() async {
-    final QuerySnapshot snapshot = await userRef.where("name", isEqualTo: 'Kushantha').getDocuments();
+    final QuerySnapshot snapshot = await userRef
+        .where("username", isEqualTo: 'Kushantha')
+        .where('postCount', isLessThan: 6)
+        .getDocuments();
     snapshot.documents.forEach((DocumentSnapshot doc) {
       print(doc.data);
       print(doc.documentID);
