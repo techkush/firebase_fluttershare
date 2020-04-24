@@ -29,7 +29,7 @@ class _TimelineState extends State<Timeline> {
 
   getUsers() async {
     final QuerySnapshot snapshot = await userRef
-        .orderBy('postCount', descending: false)
+        .orderBy('postCount', descending: false).limit(1)
         .getDocuments();
     snapshot.documents.forEach((DocumentSnapshot doc) {
       print(doc.data);
