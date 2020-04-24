@@ -14,34 +14,27 @@ class _TimelineState extends State<Timeline> {
   @override
   void initState() {
     // TODO: implement initState
-    //getUsers();
-    getUserById();
+    getUsers();
+    //getUserById();
     super.initState();
   }
 
-  getUserById() async{
-    final String id = 'Vq2Js10PXk6hQC2GHXxQ';
-//    userRef.document(id).get().then((DocumentSnapshot doc) {
-//      print(doc.data);
-//      print(doc.documentID);
-//      print(doc.exists);
-//    });
-
-    final DocumentSnapshot doc = await userRef.document(id).get();
-    print(doc.data);
-    print(doc.documentID);
-    print(doc.exists);
-  }
-
-//  getUsers(){
-//    userRef.getDocuments().then((QuerySnapshot snapshot) {
-//      snapshot.documents.forEach((DocumentSnapshot doc) {
-//        print(doc.data);
-//        print(doc.documentID);
-//        print(doc.exists);
-//      });
-//    });
+//  getUserById() async{
+//    final String id = 'Vq2Js10PXk6hQC2GHXxQ';
+//    final DocumentSnapshot doc = await userRef.document(id).get();
+//    print(doc.data);
+//    print(doc.documentID);
+//    print(doc.exists);
 //  }
+
+  getUsers() async {
+    final QuerySnapshot snapshot = await userRef.where("name", isEqualTo: 'Kushantha').getDocuments();
+    snapshot.documents.forEach((DocumentSnapshot doc) {
+      print(doc.data);
+      print(doc.documentID);
+      print(doc.exists);
+    });
+  }
 
   @override
   Widget build(context) {
