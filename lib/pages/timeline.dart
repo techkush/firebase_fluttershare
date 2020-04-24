@@ -19,8 +19,8 @@ class _TimelineState extends State<Timeline> {
     //getUsers();
     //getUserById();
     //createUser();
-    //updateUser();
-    deleteUser();
+    updateUser();
+    //deleteUser();
     super.initState();
   }
 
@@ -33,15 +33,25 @@ class _TimelineState extends State<Timeline> {
   }
 
   updateUser() async{
-    await userRef.document('aahssdbdddnd').updateData({
-      'username': 'Jeff Mark',
-      'postCount': 0,
-      'isAdmin': false
-    });
+    final doc = await userRef.document('aahssdbdddnd').get();
+    if(doc.exists){
+      doc.reference.updateData({
+        'username': 'Jeff Mark',
+        'postCount': 0,
+        'isAdmin': false
+      });
+    }else{
+      print('user not there');
+    }
   }
 
   deleteUser() async{
-    await userRef.document('aahssdbdddnd').delete();
+    final DocumentSnapshot doc = await userRef.document('aahssdbdddnd').get();
+    if(doc.exists){
+      doc.reference.delete();
+    }else{
+      print('user not there');
+    }
   }
 
 //  getUserById() async{
