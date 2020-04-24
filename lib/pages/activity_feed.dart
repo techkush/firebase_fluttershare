@@ -13,6 +13,7 @@ class _ActivityFeedState extends State<ActivityFeed> {
 }
 
 class ActivityFeedItem extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return Text('Activity Feed Item');
