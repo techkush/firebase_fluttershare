@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttershare/models/user.dart';
 import 'package:fluttershare/widgets/progress.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as Im;
@@ -114,15 +115,21 @@ class _UploadState extends State<Upload> {
     });
   }
 
-  Future<String> uploadImage(imageFile) async{
-    StorageUploadTask uploadTask = storageRef.child('post_$postId.jpg').putFile(imageFile);
+  Future<String> uploadImage(imageFile) async {
+    StorageUploadTask uploadTask =
+        storageRef.child('post_$postId.jpg').putFile(imageFile);
     StorageTaskSnapshot storageSnap = await uploadTask.onComplete;
     String downloadUrl = await storageSnap.ref.getDownloadURL();
     return downloadUrl;
   }
 
-  createPostInFirestore({String mediaUrl, String location, String description}){
-    postsRef.document(widget.currentUser.id).collection('userPosts').document(postId).setData({
+  createPostInFirestore(
+      {String mediaUrl, String location, String description}) {
+    postsRef
+        .document(widget.currentUser.id)
+        .collection('userPosts')
+        .document(postId)
+        .setData({
       'postId': postId,
       'ownerId': widget.currentUser.id,
       'username': widget.currentUser.username,
@@ -141,10 +148,9 @@ class _UploadState extends State<Upload> {
     await compressImage();
     String mediaUrl = await uploadImage(file);
     createPostInFirestore(
-      mediaUrl: mediaUrl,
-      location: locationController.text,
-      description: captionController.text
-    );
+        mediaUrl: mediaUrl,
+        location: locationController.text,
+        description: captionController.text);
     captionController.clear();
     locationController.clear();
     setState(() {
@@ -247,7 +253,7 @@ class _UploadState extends State<Upload> {
                 borderRadius: BorderRadius.circular(30.0),
               ),
               color: Colors.blue,
-              onPressed: () => print('get user location'),
+              onPressed: getUserLocation,
               icon: Icon(
                 Icons.my_location,
                 color: Colors.white,
@@ -257,6 +263,19 @@ class _UploadState extends State<Upload> {
         ],
       ),
     );
+  }
+
+  getUserLocation() async {
+    Position position = await Geolocator()
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    List<Placemark> placemarks = await Geolocator()
+        .placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark placemark = placemarks[0];
+    String completeAddress =
+        '${placemark.subThoroughfare} ${placemark.thoroughfare}, ${placemark.subLocality} ${placemark.locality}, ${placemark.subAdministrativeArea}, ${placemark.administrativeArea} ${placemark.postalCode}, ${placemark.country}';
+    print(completeAddress);
+    String formattedAddress = '${placemark.locality}, ${placemark.country}';
+    locationController.text = formattedAddress;
   }
 
   @override
