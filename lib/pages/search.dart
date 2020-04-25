@@ -79,10 +79,11 @@ class _SearchState extends State<Search> {
         if(!snapshot.hasData){
           return circularProgress();
         }else{
-          List<Text> searchResults = [];
+          List<UserResult> searchResults = [];
           snapshot.data.documents.forEach((doc){
             User user = User.fromDocument(doc);
-            searchResults.add(Text(user.username));
+            UserResult searchResult = UserResult(user);
+            searchResults.add(searchResult);
           });
           return ListView(
             children: searchResults,
@@ -103,8 +104,35 @@ class _SearchState extends State<Search> {
 }
 
 class UserResult extends StatelessWidget {
+  final User user;
+  UserResult(this.user);
   @override
   Widget build(BuildContext context) {
-    return Text("User Result");
+    return Container(
+      color: Theme.of(context).primaryColor.withOpacity(0.7),
+      child: Column(
+        children: <Widget>[
+          GestureDetector(
+            onTap: () => print('tapped'),
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: Colors.grey,
+                backgroundImage: NetworkImage(user.photoUrl),
+              ),
+              title: Text(user.displayName, style: TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold
+              ), ),
+              subtitle: Text(user.username, style: TextStyle(
+                color: Colors.white
+              ),),
+            ),
+          ),
+          Divider(
+            height: 2.0,
+            color: Colors.white54,
+          )
+        ],
+      ),
+    );
   }
 }
