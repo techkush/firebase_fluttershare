@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttershare/models/user.dart';
@@ -11,7 +12,9 @@ import 'package:fluttershare/pages/upload.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn();
-final userRef = Firestore.instance.collection('users');
+final StorageReference storageRef = FirebaseStorage.instance.ref();
+final usersRef = Firestore.instance.collection('users');
+final postsRef = Firestore.instance.collection('posts');
 final DateTime timestamp = DateTime.now();
 User currentUser;
 
@@ -44,9 +47,8 @@ class _HomeState extends State<Home> {
   }
 
   handleSignIn(GoogleSignInAccount account) {
-    createUserInFirestore();
     if (account != null) {
-      print('User signed in!: $account');
+      createUserInFirestore();
       setState(() {
         isAuth = true;
       });
@@ -58,17 +60,17 @@ class _HomeState extends State<Home> {
   }
 
   createUserInFirestore() async {
-    // 1) check if users exists in users collection in database (according to their id)
+    // 1) check if user exists in users collection in database (according to their id)
     final GoogleSignInAccount user = googleSignIn.currentUser;
-    DocumentSnapshot doc = await userRef.document(user.id).get();
+    DocumentSnapshot doc = await usersRef.document(user.id).get();
 
-    // 2) if the user doesn't exist, then we want to take them to the create account page
     if (!doc.exists) {
+      // 2) if the user doesn't exist, then we want to take them to the create account page
       final username = await Navigator.push(
           context, MaterialPageRoute(builder: (context) => CreateAccount()));
 
       // 3) get username from create account, use it to make new user document in users collection
-      userRef.document(user.id).setData({
+      usersRef.document(user.id).setData({
         "id": user.id,
         "username": username,
         "photoUrl": user.photoUrl,
@@ -78,11 +80,9 @@ class _HomeState extends State<Home> {
         "timestamp": timestamp
       });
 
-      doc = await userRef.document(user.id).get();
+      doc = await usersRef.document(user.id).get();
     }
     currentUser = User.fromDocument(doc);
-    print(currentUser);
-    print(currentUser.username);
   }
 
   @override
@@ -117,13 +117,13 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: PageView(
         children: <Widget>[
-          //Timeline(),
+          // Timeline(),
           RaisedButton(
             child: Text('Logout'),
             onPressed: logout,
           ),
           ActivityFeed(),
-          Upload(),
+          Upload(currentUser: currentUser),
           Search(),
           Profile(),
         ],
